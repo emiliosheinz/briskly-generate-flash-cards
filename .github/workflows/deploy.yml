@@ -7,7 +7,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  DOCKER_IMAGE: briskly-generate-flash-cards-app
+  DOCKER_IMAGE: briskly-generate-flash-cards
   ECR_CONTAINER_NAME: briskly-generate-flash-cards
   ECR_REPOSITORY_URL: 022559444262.dkr.ecr.us-east-1.amazonaws.com
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
