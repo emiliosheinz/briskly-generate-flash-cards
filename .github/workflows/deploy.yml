@@ -11,6 +11,8 @@ env:
   ECR_CONTAINER_NAME: briskly-generate-flash-cards
   ECR_REPOSITORY_URL: 022559444262.dkr.ecr.us-east-1.amazonaws.com
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  EC2_REMOTE_HOST: ec2-107-23-241-18.compute-1.amazonaws.com
+  EC2_REMOTE_USER: ubuntu
 
 jobs:
   deploy:
@@ -44,15 +46,22 @@ jobs:
         run: |
           docker build -t $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest .
           docker push $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
+      
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github-actions-key
+          chmod 600 ~/.ssh/github-actions-key
+          cat >>~/.ssh/config << END
+          Host ec2
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/github-actions-key
+            StrictHostKeyChecking no
+          END
 
-      - name: SSH into EC2 instance
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.EC2_INSTANCE_IP }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
+      - name: Docker run 
+          run: |
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
             docker pull $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
