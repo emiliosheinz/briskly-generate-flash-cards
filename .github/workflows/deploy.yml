@@ -46,7 +46,7 @@ jobs:
         run: |
           docker build -t $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest .
           docker push $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
-      
+
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
@@ -60,9 +60,9 @@ jobs:
             StrictHostKeyChecking no
           END
 
-      - name: Docker run 
-          run: |
-            docker stop $CONTAINER_NAME || true
-            docker rm $CONTAINER_NAME || true
-            docker pull $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
-            docker run -d -p 80:80 --name $CONTAINER_NAME $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
+      - name: Docker run
+        run: |
+          docker stop $CONTAINER_NAME || true
+          docker rm $CONTAINER_NAME || true
+          docker pull $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
+          docker run -d -p 80:80 --name $CONTAINER_NAME $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
