@@ -8,8 +8,8 @@ on:
 env:
   AWS_REGION: us-east-1
   DOCKER_IMAGE: briskly-generate-flash-cards-app
-  CONTAINER_NAME: briskly-generate-flash-cards
-  ECR_REPOSITORY_URL: 022559444262.dkr.ecr.us-east-1.amazonaws.com/briskly-generate-flash-cards
+  ECR_CONTAINER_NAME: briskly-generate-flash-cards
+  ECR_REPOSITORY_URL: 022559444262.dkr.ecr.us-east-1.amazonaws.com
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
@@ -39,11 +39,9 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build, tag, and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_URL:latest .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY_URL:latest
+          docker build -t $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest .
+          docker push $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
 
       - name: SSH into EC2 instance
         uses: appleboy/ssh-action@v0.1.8
@@ -55,5 +53,5 @@ jobs:
           script: |
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
-            docker pull $ECR_REPOSITORY_URL/$DOCKER_IMAGE:latest
-            docker run -d -p 80:80 --name $CONTAINER_NAME $ECR_REPOSITORY_URL/$DOCKER_IMAGE:latest
+            docker pull $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
+            docker run -d -p 80:80 --name $CONTAINER_NAME $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
