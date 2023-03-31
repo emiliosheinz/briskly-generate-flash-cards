@@ -1,0 +1,38 @@
+{
+  "name": "briskly-generate-flash-cards",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsup src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emiliosheinz/briskly-generate-flash-cards.git"
+  },
+  "author": "emiliosheinz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emiliosheinz/briskly-generate-flash-cards/issues"
+  },
+  "homepage": "https://github.com/emiliosheinz/briskly-generate-flash-cards#readme",
+  "devDependencies": {
+    "@types/lodash": "^4.14.192",
+    "@types/node": "^18.15.11",
+    "tsup": "^6.7.0",
+    "tsx": "^3.12.6",
+    "typescript": "^5.0.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "fastify": "^4.15.0",
+    "lodash": "^4.17.21",
+    "openai": "^3.2.1"
+  },
+  "engines": {
+    "node": "18"
+  }
+}
