@@ -47,22 +47,32 @@ jobs:
           docker build -t $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest .
           docker push $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
 
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github-actions-key
-          chmod 600 ~/.ssh/github-actions-key
-          cat >> ~/.ssh/config << END
-          Host ec2
-            HostName $SSH_HOST
-            User $SSH_USER
-            IdentityFile ~/.ssh/github-actions-key
-            StrictHostKeyChecking no
-          END
+      # - name: Configure SSH
+      #   run: |
+      #     mkdir -p ~/.ssh/
+      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/github-actions-key
+      #     chmod 600 ~/.ssh/github-actions-key
+      #     cat >> ~/.ssh/config << END
+      #     Host ec2
+      #       HostName $SSH_HOST
+      #       User $SSH_USER
+      #       IdentityFile ~/.ssh/github-actions-key
+      #       StrictHostKeyChecking no
+      #     END
 
-      - name: Docker run
-        run: |
-          docker stop $DOCKER_IMAGE || true
-          docker rm $DOCKER_IMAGE || true
-          docker pull $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
-          docker run -d --name $DOCKER_IMAGE $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
+      # - name: Docker run
+      #   run: |
+      #     docker stop $DOCKER_IMAGE || true
+      #     docker rm $DOCKER_IMAGE || true
+      #     docker pull $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
+      #     docker run -d --name $DOCKER_IMAGE $ECR_REPOSITORY_URL/$ECR_CONTAINER_NAME:latest
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          port: 22
+          key: $SSH_PRIVATE_KEY
+          host: $EC2_REMOTE_HOST
+          username: $EC2_REMOTE_USER
+          script: |
+            whoami
+            ls -al
