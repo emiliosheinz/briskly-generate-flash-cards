@@ -2,18 +2,10 @@ import dotenv from 'dotenv'
 import fastify from 'fastify'
 import random from 'lodash/random'
 import shuffle from 'lodash/shuffle'
-import { Configuration, OpenAIApi } from 'openai'
+import { openai } from './openai'
+import { trimAndRemoveDoubleQuotes } from './utils'
 
 dotenv.config()
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
-const openai = new OpenAIApi(configuration)
-
-const trimAndRemoveDoubleQuotes = (str: string) =>
-  str.trim().replaceAll('"', '')
 
 const app = fastify()
 
