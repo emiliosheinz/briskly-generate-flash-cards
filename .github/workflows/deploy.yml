@@ -8,9 +8,8 @@ on:
 env:
   AWS_REGION: us-east-1
   DOCKER_IMAGE: briskly-generate-flash-cards-app
-  CONTAINER_NAME: briskly-generate-flash-cards-app
+  CONTAINER_NAME: briskly-generate-flash-cards
   ECR_REPOSITORY_URL: 022559444262.dkr.ecr.us-east-1.amazonaws.com/briskly-generate-flash-cards
-  INSTANCE_IP: ${{ secrets.EC2_INSTANCE_IP }}
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
@@ -28,19 +27,28 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Docker image
-        run: docker build -t $DOCKER_IMAGE .
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
 
-      - name: Push Docker image to AWS ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URL
-          docker tag $DOCKER_IMAGE:latest $ECR_REPOSITORY_URL/$DOCKER_IMAGE:latest
-          docker push $ECR_REPOSITORY_URL/$DOCKER_IMAGE:latest
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       - name: SSH into EC2 instance
         uses: appleboy/ssh-action@v0.1.8
         with:
-          host: $INSTANCE_IP
+          host: ${{ secrets.EC2_INSTANCE_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
