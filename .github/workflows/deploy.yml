@@ -38,7 +38,7 @@ jobs:
           docker push $ECR_REPOSITORY_URL/$DOCKER_IMAGE:latest
 
       - name: SSH into EC2 instance
-        uses: appleboy/ssh-action@v0.3.0
+        uses: appleboy/ssh-action@v0.1.8
         with:
           host: $INSTANCE_IP
           username: ubuntu
