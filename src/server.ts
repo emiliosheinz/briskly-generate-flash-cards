@@ -17,9 +17,10 @@ app.register(cors, {
 
     if (!origin) return cb(null, true)
 
-    const allowedHosts = ['localhost', 'briskly.app']
+    const allowedHosts = ['localhost', 'dev.briskly.app', 'briskly.app']
+    const originHostname = new URL(origin).hostname
 
-    if (allowedHosts.includes(new URL(origin).hostname)) {
+    if (allowedHosts.includes(originHostname)) {
       cb(null, true)
       return
     }
