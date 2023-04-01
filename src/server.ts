@@ -10,8 +10,22 @@ import { trimAndRemoveDoubleQuotes } from './utils'
 dotenv.config()
 
 const app = fastify()
+
 app.register(cors, {
-  origin: 'http://localhost:3000',
+  origin: (origin, cb) => {
+    const error = () => cb(new Error(''), false)
+
+    if (!origin) return cb(null, true)
+
+    const allowedHosts = ['localhost', 'briskly.app']
+
+    if (allowedHosts.includes(new URL(origin).hostname)) {
+      cb(null, true)
+      return
+    }
+
+    error()
+  },
 })
 
 app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
