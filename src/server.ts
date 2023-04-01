@@ -1,13 +1,18 @@
 import dotenv from 'dotenv'
 import fastify from 'fastify'
+import cors from '@fastify/cors'
 import random from 'lodash/random'
 import shuffle from 'lodash/shuffle'
+
 import { openai } from './openai'
 import { trimAndRemoveDoubleQuotes } from './utils'
 
 dotenv.config()
 
 const app = fastify()
+app.register(cors, {
+  origin: 'http://localhost:3000',
+})
 
 app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
   '/ai-powered-flashcards',
