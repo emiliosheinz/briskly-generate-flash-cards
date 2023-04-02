@@ -1,4 +1,5 @@
-import dotenv from 'dotenv'
+import './config-env'
+
 import fastify from 'fastify'
 import cors from '@fastify/cors'
 import random from 'lodash/random'
@@ -6,8 +7,6 @@ import shuffle from 'lodash/shuffle'
 
 import { openai } from './openai'
 import { trimAndRemoveDoubleQuotes } from './utils'
-
-dotenv.config()
 
 const app = fastify()
 
@@ -54,6 +53,7 @@ app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
       /** Build prompt asking OpenAI to generate a csv string */
       const prompt = `Levando em conta o contexto ${title}, gere um Array JSON de tamanho ${amountOfCards} com perguntas e respostas curtas e diretas, de no máximo ${charactersPerSentence} caracteres, sobre ${joinedTopics}. [{question: "pergunta", answer: "resposta"}, ...]`
 
+      console.log('>>> Teste')
       const response = await openai.createChatCompletion(
         {
           n: 1,
