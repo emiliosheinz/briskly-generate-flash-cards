@@ -53,7 +53,6 @@ app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
       /** Build prompt asking OpenAI to generate a csv string */
       const prompt = `Levando em conta o contexto ${title}, gere um Array JSON de tamanho ${amountOfCards} com perguntas e respostas curtas e diretas, de no máximo ${charactersPerSentence} caracteres, sobre ${joinedTopics}. [{question: "pergunta", answer: "resposta"}, ...]`
 
-      console.log('>>> Teste')
       const response = await openai.createChatCompletion(
         {
           n: 1,
@@ -83,6 +82,7 @@ app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
 
       return cards
     } catch (error) {
+      console.log('Erro inesperado ao gerar os cards', error)
       reply
         .status(500)
         .send({ message: 'Erro inesperado ao gerar os cards', error })
