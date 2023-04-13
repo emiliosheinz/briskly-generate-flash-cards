@@ -42,7 +42,6 @@ app.get<{
 }>('/ai-powered-flashcards', async (request, reply) => {
   let generatedJsonString: string | undefined
   const { topics, title, something } = request.query
-  console.log(something[10].toString())
 
   if (!topics?.length || !title) {
     reply
