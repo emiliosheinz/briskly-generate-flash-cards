@@ -38,8 +38,6 @@ app.get<{
   let generatedJsonString: string | undefined
   const { topics, title, something } = request.query
 
-  console.log(something[10].toString())
-
   if (!topics?.length || !title) {
     reply
       .status(400)
@@ -47,6 +45,8 @@ app.get<{
   }
 
   try {
+    console.log(something[10].toString())
+
     const amountOfCards = 3
     const charactersPerSentence = 65
 
