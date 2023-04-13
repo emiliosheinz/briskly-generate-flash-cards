@@ -28,72 +28,69 @@ app.register(cors, {
   },
 })
 
+app.setErrorHandler((error, _, reply) => {
+  console.log('❌ Unexpected server side error:', error.message)
+  reply.send(error)
+})
+
 app.get('/healthcheck', async (_, reply) => {
   reply.status(200).send({ message: 'OK' })
 })
 
 app.get<{
   Querystring: { topics?: Array<string>; title?: string; something: string }
-}>(
-  '/ai-powered-flashcards',
-  {
-    onError: error => {
-      console.log('Error: ', JSON.stringify(error).replaceAll('\n', ''))
-    },
-  },
-  async (request, reply) => {
-    let generatedJsonString: string | undefined
-    const { topics, title, something } = request.query
-    console.log(something[10].toString())
+}>('/ai-powered-flashcards', async (request, reply) => {
+  let generatedJsonString: string | undefined
+  const { topics, title, something } = request.query
+  console.log(something[10].toString())
 
-    if (!topics?.length || !title) {
-      reply
-        .status(400)
-        .send({ message: 'É necessário informar os tópicos e o título.' })
-    }
-
-    const amountOfCards = 3
-    const charactersPerSentence = 65
-
-    /**
-     * Selects between 1 and 3 random topics from the array of topics
-     * and build a string with the topics separated by 'ou'
-     */
-    const joinedTopics = shuffle(topics).slice(0, random(1, 3)).join(' ou ')
-
-    /** Build prompt asking OpenAI to generate a csv string */
-    const prompt = `Levando em conta o contexto ${title}, gere um Array JSON de tamanho ${amountOfCards} com perguntas e respostas curtas e diretas, de no máximo ${charactersPerSentence} caracteres, sobre ${joinedTopics}. [{question: "pergunta", answer: "resposta"}, ...]`
-
-    const response = await openai.createChatCompletion(
-      {
-        n: 1,
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.8,
-        model: 'gpt-3.5-turbo',
-        max_tokens: amountOfCards * charactersPerSentence,
-      },
-      { timeout: 30_000 }
-    )
-
-    generatedJsonString = response.data.choices[0]?.message?.content
-
-    if (!generatedJsonString) {
-      throw new Error('Não foi possível gerar as perguntas e respostas.')
-    }
-
-    const generatedJson = JSON.parse(generatedJsonString)
-
-    const cards = generatedJson.map(
-      ({ question, answer }: { question: string; answer: string }) => ({
-        question: trimAndRemoveDoubleQuotes(question),
-        validAnswers: trimAndRemoveDoubleQuotes(answer),
-        isAiPowered: true,
-      })
-    )
-
-    return cards
+  if (!topics?.length || !title) {
+    reply
+      .status(400)
+      .send({ message: 'É necessário informar os tópicos e o título.' })
   }
-)
+
+  const amountOfCards = 3
+  const charactersPerSentence = 65
+
+  /**
+   * Selects between 1 and 3 random topics from the array of topics
+   * and build a string with the topics separated by 'ou'
+   */
+  const joinedTopics = shuffle(topics).slice(0, random(1, 3)).join(' ou ')
+
+  /** Build prompt asking OpenAI to generate a csv string */
+  const prompt = `Levando em conta o contexto ${title}, gere um Array JSON de tamanho ${amountOfCards} com perguntas e respostas curtas e diretas, de no máximo ${charactersPerSentence} caracteres, sobre ${joinedTopics}. [{question: "pergunta", answer: "resposta"}, ...]`
+
+  const response = await openai.createChatCompletion(
+    {
+      n: 1,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.8,
+      model: 'gpt-3.5-turbo',
+      max_tokens: amountOfCards * charactersPerSentence,
+    },
+    { timeout: 30_000 }
+  )
+
+  generatedJsonString = response.data.choices[0]?.message?.content
+
+  if (!generatedJsonString) {
+    throw new Error('Não foi possível gerar as perguntas e respostas.')
+  }
+
+  const generatedJson = JSON.parse(generatedJsonString)
+
+  const cards = generatedJson.map(
+    ({ question, answer }: { question: string; answer: string }) => ({
+      question: trimAndRemoveDoubleQuotes(question),
+      validAnswers: trimAndRemoveDoubleQuotes(answer),
+      isAiPowered: true,
+    })
+  )
+
+  return cards
+})
 
 app
   .listen({
