@@ -28,6 +28,10 @@ app.register(cors, {
   },
 })
 
+app.get('/healthcheck', async (_, reply) => {
+  reply.status(200).send({ message: 'OK' })
+})
+
 app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
   '/ai-powered-flashcards',
   async (request, reply) => {
