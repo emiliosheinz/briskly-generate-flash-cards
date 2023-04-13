@@ -86,7 +86,7 @@ app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
 
       return cards
     } catch (error) {
-      console.log('🔴 Unexpected error generating flashcards', error)
+      console.log('Error: ', String(error))
       reply
         .status(500)
         .send({ message: 'Erro inesperado ao gerar os cards', error })
