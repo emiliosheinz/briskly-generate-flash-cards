@@ -34,18 +34,23 @@ app.get('/healthcheck', async (_, reply) => {
 
 app.get<{
   Querystring: { topics?: Array<string>; title?: string; something: string }
-}>('/ai-powered-flashcards', async (request, reply) => {
-  let generatedJsonString: string | undefined
-  const { topics, title, something } = request.query
-
-  if (!topics?.length || !title) {
-    reply
-      .status(400)
-      .send({ message: 'É necessário informar os tópicos e o título.' })
-  }
-
-  try {
+}>(
+  '/ai-powered-flashcards',
+  {
+    onError: error => {
+      console.log('Error: ', JSON.stringify(error).replaceAll('\n', ''))
+    },
+  },
+  async (request, reply) => {
+    let generatedJsonString: string | undefined
+    const { topics, title, something } = request.query
     console.log(something[10].toString())
+
+    if (!topics?.length || !title) {
+      reply
+        .status(400)
+        .send({ message: 'É necessário informar os tópicos e o título.' })
+    }
 
     const amountOfCards = 3
     const charactersPerSentence = 65
@@ -87,13 +92,8 @@ app.get<{
     )
 
     return cards
-  } catch (error) {
-    console.log('Error: ', JSON.stringify(error).replaceAll('\n', ''))
-    reply
-      .status(500)
-      .send({ message: 'Erro inesperado ao gerar os cards', error })
   }
-})
+)
 
 app
   .listen({
