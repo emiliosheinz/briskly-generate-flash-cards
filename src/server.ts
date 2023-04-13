@@ -41,6 +41,7 @@ app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
     }
 
     try {
+      console.error(topics, title)
       const amountOfCards = 3
       const charactersPerSentence = 65
 
@@ -82,7 +83,7 @@ app.get<{ Querystring: { topics?: Array<string>; title?: string } }>(
 
       return cards
     } catch (error) {
-      console.log('Erro inesperado ao gerar os cards', error)
+      console.error('Erro inesperado ao gerar os cards', error)
       reply
         .status(500)
         .send({ message: 'Erro inesperado ao gerar os cards', error })
