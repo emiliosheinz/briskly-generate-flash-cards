@@ -27,7 +27,3 @@ Briskly is a flashcard digitization app where I utilize Natural Language Generat
   ```
   yarn dev
   ```
-
-
-## :man: Contributors
-- [@emiliosheinz](https://github.com/emiliosheinz)
