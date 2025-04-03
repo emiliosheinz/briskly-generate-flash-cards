@@ -40,8 +40,8 @@ app.get('/healthcheck', async (_, reply) => {
 app.get<{
   Querystring: { topics?: Array<string>; title?: string; something: string }
 }>('/ai-powered-flashcards', async (request, reply) => {
-  let generatedJsonString: string | undefined
-  const { topics, title, something } = request.query
+  let generatedJsonString: string | null
+  const { topics, title } = request.query
 
   if (!topics?.length || !title) {
     reply
@@ -59,20 +59,21 @@ app.get<{
   const joinedTopics = shuffle(topics).slice(0, random(1, 3)).join(' ou ')
 
   /** Build prompt asking OpenAI to generate a csv string */
-  const prompt = `Levando em conta o contexto ${title}, gere um Array JSON válido de tamanho ${amountOfCards} com perguntas e respostas curtas e diretas, de no máximo ${charactersPerSentence} caracteres, sobre ${joinedTopics}. [{question: "texto da pergunta", answer: "texto da resposta"}, ...]`
+  const prompt = `Levando em conta o contexto ${title}, gere um Array JSON válido de tamanho ${amountOfCards} com perguntas e respostas curtas e diretas, de no máximo ${charactersPerSentence} caracteres, sobre ${joinedTopics}. { flashcards: [{ question: "resposta", answer: "resposta"}, ...] }`
 
-  const response = await openai.createChatCompletion(
+  const response = await openai.chat.completions.create(
     {
       n: 1,
-      messages: [{ role: 'user', content: prompt }],
       temperature: 0.8,
       model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
       max_tokens: amountOfCards * charactersPerSentence,
+      response_format: { type: 'json_object' },
     },
     { timeout: 30_000 }
   )
 
-  generatedJsonString = response.data.choices[0]?.message?.content
+  generatedJsonString = response.choices[0].message.content
 
   if (!generatedJsonString) {
     throw new Error('Não foi possível gerar as perguntas e respostas.')
@@ -80,7 +81,7 @@ app.get<{
 
   const generatedJson = JSON.parse(generatedJsonString)
 
-  const cards = generatedJson.map(
+  const cards = generatedJson.flashcards.map(
     ({ question, answer }: { question: string; answer: string }) => ({
       question: trimAndRemoveDoubleQuotes(question),
       validAnswers: trimAndRemoveDoubleQuotes(answer),
