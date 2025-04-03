@@ -29,7 +29,7 @@ app.register(cors, {
 })
 
 app.setErrorHandler((error, _, reply) => {
-  console.log('❌ Unexpected server side error:', error.message)
+  console.log('❌ Unexpected server side error:', error)
   reply.send(error)
 })
 
