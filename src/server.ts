@@ -59,7 +59,7 @@ app.get<{
   const joinedTopics = shuffle(topics).slice(0, random(1, 3)).join(' ou ')
 
   /** Build prompt asking OpenAI to generate a csv string */
-  const prompt = `Levando em conta o contexto ${title}, gere um Array JSON de tamanho ${amountOfCards} com perguntas e respostas curtas e diretas, de no máximo ${charactersPerSentence} caracteres, sobre ${joinedTopics}. [{question: "pergunta", answer: "resposta"}, ...]`
+  const prompt = `Levando em conta o contexto ${title}, gere um Array JSON válido de tamanho ${amountOfCards} com perguntas e respostas curtas e diretas, de no máximo ${charactersPerSentence} caracteres, sobre ${joinedTopics}. [{question: "texto da pergunta", answer: "texto da resposta"}, ...]`
 
   const response = await openai.createChatCompletion(
     {
